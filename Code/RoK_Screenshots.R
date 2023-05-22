@@ -103,6 +103,9 @@ all_pics_DT <- data.table(
 setorder(all_pics_DT, -create_date)
 
 
+
+
+# individual power ranking main section -------------------------------------
 power_ranking_txt <- image_read(all_pics_DT[4,1][[1]]) %>%
   magick::image_resize("1000") %>%
   magick::image_crop(
@@ -110,30 +113,29 @@ power_ranking_txt <- image_read(all_pics_DT[4,1][[1]]) %>%
   magick::image_ocr() %>% data.table::tstrsplit(., split = "\n\n|\n") %>%
   unlist %>% gsub(pattern = "“|»|,", replace = "", x = .)
 
-
-grep(power_ranking_txt,
-     pattern = ".*[0-9]{7,}$", value = TRUE) %>%
-  strsplit(., split = "[0-9]{7,}$")
-
-
-data.table(player_row = grep(power_ranking_txt,
+power_ranking_dt <- data.table(player_row = grep(power_ranking_txt,
   pattern = ".*[0-9]{7,}$", value = TRUE)) %>%
   .[, player_names := strsplit(player_row, split = "[0-9]{7,}$")] %>%
-  .[, player_power := stringr::str_extract(player_row, pattern = " [0-9]{7,}")] %>%
-  .[]
+  .[, player_power := stringr::str_extract(player_row,
+      pattern = " [0-9]{7,}")] %>% .[]
 
-## Idea #1 - grab non Alliance text...
-# if (is_even(length(power_ranking_txt))) {
-#   prt_lab <- rep(c("Player", "Alliance"), length(power_ranking_txt)/2)
-#   names(power_ranking_txt) <- prt_lab
-#   ifelse(names(power_ranking_txt) == "Player", power_ranking_txt, NA)
-#   Filter(power_ranking_txt, f = function(x) names(x) == "Player")
-# }
+# player main profile section ------------------------------------------------
+profile_main_txt <- image_read(all_pics_DT[3,1][[1]]) %>%
+  magick::image_resize("1000") %>%
+  magick::image_crop(
+    geometry_area(width = 550, height = 180, x_off = 350, y_off = 130)) %>%
+  magick::image_ocr() %>% data.table::tstrsplit(., split = "\n\n|\n") %>%
+  unlist %>% gsub(pattern = "“|»|,|‘", replace = "", x = .)
 
+gov_ID <- profile_main_txt[1] %>% stringr::str_extract(
+  pattern = "[0-9]{6,}")
 
-
-
-
+profile_main_dt <- c(Governor_ID = gov_ID,
+  unlist(profile_main_txt[4] %>%
+    stringr::str_extract(pattern = "[0-9]{5,}\\s[0-9]{1,}") %>%
+    tstrsplit(split = "\\s"))
+)
+as.data.table(profile_main_dt)
 
 
 move_up_one_rank <- function() {
