@@ -1,3 +1,6 @@
+# auto screen capture 2.5.1.8 Limoncello
+# blue stacks
+
 # https://lookerstudio.google.com/u/0/reporting/a502309b-390f-4a15-9785-9e131bd646c6/page/jFlQD
 
 
