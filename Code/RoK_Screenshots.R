@@ -1,3 +1,5 @@
+# https://lookerstudio.google.com/u/0/reporting/a502309b-390f-4a15-9785-9e131bd646c6/page/jFlQD
+
 
 # install.packages("KeyboardSimulator")
 # install.packages("tesseract")
@@ -131,11 +133,19 @@ gov_ID <- profile_main_txt[1] %>% stringr::str_extract(
   pattern = "[0-9]{6,}")
 
 profile_main_dt <- c(Governor_ID = gov_ID,
+
+  Player_Name = stringr::str_extract(profile_main_txt[2],
+    pattern = "(.*?)=", group = 1) %>%
+    stringi::stri_trim_both(str = .),
+
+
   unlist(profile_main_txt[4] %>%
     stringr::str_extract(pattern = "[0-9]{5,}\\s[0-9]{1,}") %>%
     tstrsplit(split = "\\s"))
 )
-as.data.table(profile_main_dt)
+names(profile_main_dt) <- c("Governor_ID", "Player_Name",
+                            "Power", "Total_Killpoints")
+profile_main_dt2 <- as.data.table(as.list(profile_main_dt))
 
 
 move_up_one_rank <- function() {
